@@ -48,9 +48,10 @@ BLACKLIST = set([
     'Conditions Variable'
 ])
 
-# The <svg> elements on the page have these classes when a location is open/closed
-CLOSED = 'closed'
+# The <svg> elements on the page have these classes when a location is open/closed/maybe
 OPEN = 'check'
+CLOSED = 'closed'
+CONDITIONS_VARIABLE = 'dash'
 
 # <li> elements that are headings have this class attached
 TRAIL_HEADING = 'trail-heading'
@@ -69,14 +70,18 @@ if __name__ == "__main__":
         if status:
             status = status[0]
 
+        # Skip if the <li> doesn't correspond to a location status
         if not status or not location or location in BLACKLIST:
             continue
         if item.has_attr('class') and TRAIL_HEADING in item['class']:
             continue
 
+        # Figure out the status based on the class associated with the <svg> element
         if status.has_attr('class'):
             if OPEN in status['class']:
                 print(f"{location} is open")
+            elif CONDITIONS_VARIABLE in status['class']:
+                print(f"{location} is variable")
             elif CLOSED in status['class']:
                 print(f"{location} is closed")
             else:
