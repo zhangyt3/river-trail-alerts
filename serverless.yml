@@ -1,11 +1,16 @@
 service: river-trail-alerts
-# app and org for use with dashboard.serverless.com
-app: river-trail-alerts
-org: busstopbench
 
 provider:
   name: aws
   runtime: python3.6
+  timeout: 30
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action: "*"
+      Resource:
+        Fn::GetAtt:
+          - RiverTrailAlertsTable
+          - Arn
 
 plugins:
   - serverless-python-requirements
@@ -13,30 +18,6 @@ plugins:
 custom:
   pythonRequirements:
     dockerizePip: non-linux
-
-# you can overwrite defaults here
-#  stage: dev
-#  region: us-east-1
-
-# you can add statements to the Lambda function's IAM Role here
-#  iamRoleStatements:
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:ListBucket"
-#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:PutObject"
-#      Resource:
-#        Fn::Join:
-#          - ""
-#          - - "arn:aws:s3:::"
-#            - "Ref" : "ServerlessDeploymentBucket"
-#            - "/*"
-
-# you can define service wide environment variables here
-#  environment:
-#    variable1: value1
 
 functions:
   update:
@@ -51,13 +32,23 @@ functions:
 #      variable2: value2
 
 # you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
+resources:
+  Resources:
+    RiverTrailAlertsTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: "RiverTrailAlertsTable"
+        AttributeDefinitions:
+          - AttributeName: "pk"
+            AttributeType: "S"
+          - AttributeName: "sk"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "pk"
+            KeyType: "HASH"
+          - AttributeName: "sk"
+            KeyType: "RANGE"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 10
+          WriteCapacityUnits: 2
+
