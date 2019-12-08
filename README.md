@@ -29,3 +29,8 @@ To run unit tests just go to the root directory of this project and run
 pytest
 ```
 
+If that doesn't work try
+```
+python -m pytest
+```
+
