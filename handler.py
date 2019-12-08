@@ -1,94 +1,64 @@
 import json
+import os
+import datetime
+import logging
 
-from requests import get
-from requests.exceptions import RequestException
-from contextlib import closing
-from bs4 import BeautifulSoup
+from model.StatusModel import StatusModel
+from scrape.scraper import get_statuses
+from notify.notifier import send_updates
+
 from pprint import pprint
 
+log = logging.getLogger()
+log.setLevel(logging.WARN)
 
-def get_page(url):
+
+def get_previous_statuses(locations):
+    statuses = dict()
+    for l in locations:
+        res = StatusModel.query(
+            l,
+            limit=1,
+            scan_index_forward=False
+        )
+        res = res.next()
+
+        statuses[res.pk] = res.status
+
+    return statuses
+
+def find_diffs(prev, curr):
     """
-    Attempts to get the content at `url` by making an HTTP GET request.
-    If the content-type of response is some kind of HTML/XML, return the
-    text content, otherwise return None.
+    Returns differences between previous and current status in the form
+    (location, previous status, new status).
     """
-    try:
-        with closing(get(url, stream=True)) as resp:
-            if is_good_response(resp):
-                return resp.content
-            else:
-                return None
+    diffs = []
 
-    except RequestException as e:
-        print('Error during requests to {0} : {1}'.format(url, str(e)))
-        return None
+    for location, curr_status in curr.items():
+        if prev[location] != curr_status:
+            diffs.append((location, prev[location], curr_status))
 
+    return diffs
+    
 
-def is_good_response(resp):
-    """
-    Returns True if the response seems to be HTML, False otherwise.
-    """
-    content_type = resp.headers['Content-Type'].lower()
-    return (resp.status_code == 200 
-            and content_type is not None 
-            and content_type.find('html') > -1)
+def handle_update():
+    statuses = get_statuses()
+    previous_statuses = get_previous_statuses(statuses.keys())
+    diffs = find_diffs(previous_statuses, statuses)
 
-
-# Filter out <li> elements with this text inside during parsing
-BLACKLIST = set([
-    'Open',
-    'Closed',
-    'Conditions Variable'
-])
-
-# The <svg> elements on the page have these classes when a location is open/closed/maybe
-OPEN = 'check'
-CLOSED = 'closed'
-CONDITIONS_VARIABLE = 'dash'
-
-# <li> elements that are headings have this class attached
-TRAIL_HEADING = 'trail-heading'
-
-
-def fetch():
-    raw = get_page("https://www.theforks.com/events/skating-trail-and-park-conditions")
-    html = BeautifulSoup(raw, "html.parser")
-
-    # Each <li> element contains a <svg> which displays either a check or an X and some text that
-    # tells us the location
-    for item in html.select("li"):
-        location = item.text
-
-        status = item.findChildren("svg", recursive=False)
-        if status:
-            status = status[0]
-
-        # Skip if the <li> doesn't correspond to a location status
-        if not status or not location or location in BLACKLIST:
-            continue
-        if item.has_attr('class') and TRAIL_HEADING in item['class']:
-            continue
-
-        # Figure out the status based on the class associated with the <svg> element
-        if status.has_attr('class'):
-            if OPEN in status['class']:
-                print(f"{location} is open")
-            elif CONDITIONS_VARIABLE in status['class']:
-                print(f"{location} is variable")
-            elif CLOSED in status['class']:
-                print(f"{location} is closed")
-            else:
-                print("*" * 20)
-                print("Opps")
-                pprint(status)
-                pprint(location)
-                print("*" * 20)
-
+    if diffs:
+        send_updates(diffs)
+   
+    time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")  
+    for location, is_open in statuses.items():
+        status_model = StatusModel(pk=location, sk=time, status=is_open)
+        status_model.save()
 
 def handle(event, context):
-    fetch()
+    handle_update()
     
+    print(f'SNS Topic ARN: {str(os.environ["EMAIL_SNS_TOPIC_ARN"])}')
+
     body = {
         "message": "Go Serverless v1.0! Your function executed successfully!",
         "input": event
@@ -101,14 +71,3 @@ def handle(event, context):
 
     return response
 
-    # Use this code if you don't use the http event with the LAMBDA-PROXY
-    # integration
-    """
-    return {
-        "message": "Go Serverless v1.0! Your function executed successfully!",
-        "event": event
-    }
-    """
-
-if __name__ == "__main__":
-    handle(None, None)

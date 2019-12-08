@@ -22,3 +22,6 @@ var/
 .vscode
 venv
 node_modules
+__pycache__
+*.swp
+
