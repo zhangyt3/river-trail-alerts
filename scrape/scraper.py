@@ -39,14 +39,11 @@ def is_good_response(resp):
     content_type = resp.headers['Content-Type'].lower()
     return resp.status_code == 200 and content_type is not None and content_type.find('html') > -1
 
-def get_statuses():
-    raw = get_page("https://www.theforks.com/events/skating-trail-and-park-conditions") 
-    html = BeautifulSoup(raw, 'html.parser')
-
-    # Use the class of the <svg> element inside each <li> to determine status
+def parse_html(html: str):
+    html = BeautifulSoup(html, 'html.parser') 
     statuses = dict()
     for item in html.select('li'):
-        location = item.text
+        location = item.text.strip()
 
         status = item.findChildren('svg', recursive=False)
         if status:
@@ -61,7 +58,8 @@ def get_statuses():
         if status.has_attr('class'):
             is_open = None
             classes = status['class']
-
+            
+            # Use the class of the <svg> element inside each <li> to determine status
             if OPEN in classes:
                 log.debug(f'{location}: open')
                 is_open = 'open'
@@ -73,8 +71,13 @@ def get_statuses():
                 is_open = 'closed'
             else:
                 log.error(f'ERROR: location - {location}, classes - {classes}')
-        
+                continue
+
             statuses[location] = is_open
 
     return statuses
+        
+def get_statuses():
+    raw = get_page("https://www.theforks.com/events/skating-trail-and-park-conditions") 
+    return parse_html(raw)
 
