@@ -1,11 +1,6 @@
 import json
+import os
 import datetime
-
-from requests import get
-from requests.exceptions import RequestException
-from contextlib import closing
-from bs4 import BeautifulSoup
-from pprint import pprint
 
 from model.StatusModel import StatusModel
 from scrape.scraper import get_statuses
@@ -26,6 +21,8 @@ def handle_update():
 def handle(event, context):
     handle_update()
     
+    print(f'SNS Topic ARN: {str(os.environ["EMAIL_SNS_TOPIC_ARN"])}')
+
     body = {
         "message": "Go Serverless v1.0! Your function executed successfully!",
         "input": event

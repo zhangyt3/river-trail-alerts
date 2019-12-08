@@ -24,6 +24,8 @@ functions:
     handler: handler.handle
     events:
       - schedule: rate(30 minutes)
+    environment:
+      EMAIL_SNS_TOPIC_ARN: !Ref EmailSNSTopic 
 
 resources:
   Resources:
@@ -44,4 +46,13 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 10
           WriteCapacityUnits: 2
+    EmailSNSTopic:
+      Type: "AWS::SNS::Topic"
+      Properties:
+        DisplayName: "RiverTrailAlerts"
+        TopicName: "RiverTrailAlertsTopic"
+  Outputs:
+    EmailSNSTopicArn:
+      Value: !Ref 'EmailSNSTopic'
+      Description: ARN of the created SNS topic
 
