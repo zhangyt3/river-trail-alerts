@@ -36,7 +36,7 @@ def find_diffs(prev, curr):
 
     for location, curr_status in curr.items():
         if prev[location] != curr_status:
-            diff.append((location, prev[location], curr))
+            diffs.append((location, prev[location], curr_status))
 
     return diffs
     
