@@ -1,20 +1,55 @@
 import json
 import os
 import datetime
+import logging
 
 from model.StatusModel import StatusModel
 from scrape.scraper import get_statuses
+from update.updater import send_updates
 
+from pprint import pprint
+
+log = logging.getLogger()
+log.setLevel(logging.WARN)
+
+
+def get_previous_statuses(locations):
+    statuses = dict()
+    for l in locations:
+        res = StatusModel.query(
+            l,
+            limit=1,
+            scan_index_forward=False
+        )
+        res = res.next()
+
+        statuses[res.pk] = res.status
+
+    return statuses
+
+def find_diffs(prev, curr):
+    """
+    Returns differences between previous and current status in the form
+    (location, previous status, new status).
+    """
+    diffs = []
+
+    for location, curr_status in curr.items():
+        if prev[location] != curr_status:
+            diff.append((location, prev[location], curr))
+
+    return diffs
+    
 
 def handle_update():
     statuses = get_statuses()
+    previous_statuses = get_previous_statuses(statuses.keys())
+    diffs = find_diffs(previous_statuses, statuses)
 
-    # TODO retrieve previous statuses and compare
-
-    # TODO send out any changes
-    
-    time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")   
-    for location, is_open in statuses:
+    send_updates(diffs)
+   
+    time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")  
+    for location, is_open in statuses.items():
         status_model = StatusModel(pk=location, sk=time, status=is_open)
         status_model.save()
 

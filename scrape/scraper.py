@@ -12,7 +12,7 @@ log.setLevel(logging.DEBUG)
 IGNORE = set([
     'Open',
     'Closed',
-    'Conditions variable'
+    'Conditions Variable'
 ])
 
 # The <svg> elements on the page have these classes when a location is open/closed/conditions variable
@@ -44,7 +44,7 @@ def get_statuses():
     html = BeautifulSoup(raw, 'html.parser')
 
     # Use the class of the <svg> element inside each <li> to determine status
-    statuses = []
+    statuses = dict()
     for item in html.select('li'):
         location = item.text
 
@@ -74,7 +74,7 @@ def get_statuses():
             else:
                 log.error(f'ERROR: location - {location}, classes - {classes}')
         
-            statuses.append((location, is_open))
-    
+            statuses[location] = is_open
+
     return statuses
 
