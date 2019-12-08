@@ -19,3 +19,11 @@ sls deploy
 sls invoke --function update
 ```
 
+## Running Unit Tests
+
+To run unit tests just go to the root directory of this project and run
+
+```
+pytest
+```
+
