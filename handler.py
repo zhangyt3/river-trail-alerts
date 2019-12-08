@@ -1,10 +1,14 @@
 import json
+import datetime
 
 from requests import get
 from requests.exceptions import RequestException
 from contextlib import closing
 from bs4 import BeautifulSoup
 from pprint import pprint
+
+from model.StatusModel import StatusModel
+
 
 
 def get_page(url):
@@ -72,18 +76,28 @@ def fetch():
 
         # Figure out the status based on the class associated with the <svg> element
         if status.has_attr('class'):
+            is_open = None
+
             if OPEN in status['class']:
                 print(f"{location} is open")
+                is_open = 'open'
             elif CONDITIONS_VARIABLE in status['class']:
                 print(f"{location} is variable")
+                is_open = 'conditions variable'
             elif CLOSED in status['class']:
                 print(f"{location} is closed")
+                is_open = 'closed'
             else:
                 print("*" * 20)
                 print("Opps")
                 pprint(status)
                 pprint(location)
                 print("*" * 20)
+            
+            time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            status_model = StatusModel(pk=location, sk=time, status=is_open)
+            status_model.save()
+
 
 
 def handle(event, context):
@@ -110,5 +124,3 @@ def handle(event, context):
     }
     """
 
-if __name__ == "__main__":
-    handle(None, None)

@@ -2,7 +2,7 @@ service: river-trail-alerts
 
 provider:
   name: aws
-  runtime: python3.6
+  runtime: python3.8
   timeout: 30
   iamRoleStatements:
     - Effect: "Allow"
@@ -24,14 +24,7 @@ functions:
     handler: handler.handle
     events:
       - schedule: rate(30 minutes)
-#      - cloudwatchLog: '/aws/lambda/update'
 
-
-#    Define function environment variables here
-#    environment:
-#      variable2: value2
-
-# you can add CloudFormation resource templates here
 resources:
   Resources:
     RiverTrailAlertsTable:
