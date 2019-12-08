@@ -1,6 +1,7 @@
 import logging
 import boto3
 import os
+import json
 
 log = logging.getLogger()
 log.setLevel(logging.DEBUG)
@@ -18,6 +19,7 @@ def form_email(diffs):
     )
 
 def send_emails(client, diffs):
+    message = form_email(diffs)
     response = client.publish(
         TargetArn=os.environ['EMAIL_SNS_TOPIC_ARN'],
         Message=json.dumps({

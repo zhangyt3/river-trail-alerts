@@ -46,7 +46,8 @@ def handle_update():
     previous_statuses = get_previous_statuses(statuses.keys())
     diffs = find_diffs(previous_statuses, statuses)
 
-    send_updates(diffs)
+    if diffs:
+        send_updates(diffs)
    
     time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")  
     for location, is_open in statuses.items():

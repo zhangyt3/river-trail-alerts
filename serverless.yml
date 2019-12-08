@@ -11,6 +11,9 @@ provider:
         Fn::GetAtt:
           - RiverTrailAlertsTable
           - Arn
+    - Effect: "Allow"
+      Action: "*"
+      Resource: !Ref EmailSNSTopic
 
 plugins:
   - serverless-python-requirements
