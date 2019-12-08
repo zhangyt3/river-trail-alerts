@@ -1,5 +1,7 @@
 # River Trail Alerts
 
+[![CircleCI](https://circleci.com/gh/zhangyt3/wpg-air-quality.svg?style=shield)](https://circleci.com/gh/zhangyt3/wpg-air-quality)
+
 Periodically scraping the [River Trail Status Page](https://www.theforks.com/events/skating-trail-and-park-conditions) to find out whether or not each segment is open. If there is a change, a notification will be sent out via your chosen method.
 
 To deploy and test in your AWS account (assuming you've [set up your AWS credentials in your AWS CLI already](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)):
