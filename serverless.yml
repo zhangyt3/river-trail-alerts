@@ -1,11 +1,19 @@
 service: river-trail-alerts
-# app and org for use with dashboard.serverless.com
-app: river-trail-alerts
-org: busstopbench
 
 provider:
   name: aws
-  runtime: python3.6
+  runtime: python3.8
+  timeout: 30
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action: "*"
+      Resource:
+        Fn::GetAtt:
+          - RiverTrailAlertsTable
+          - Arn
+    - Effect: "Allow"
+      Action: "*"
+      Resource: !Ref EmailSNSTopic
 
 plugins:
   - serverless-python-requirements
@@ -14,50 +22,65 @@ custom:
   pythonRequirements:
     dockerizePip: non-linux
 
-# you can overwrite defaults here
-#  stage: dev
-#  region: us-east-1
-
-# you can add statements to the Lambda function's IAM Role here
-#  iamRoleStatements:
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:ListBucket"
-#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:PutObject"
-#      Resource:
-#        Fn::Join:
-#          - ""
-#          - - "arn:aws:s3:::"
-#            - "Ref" : "ServerlessDeploymentBucket"
-#            - "/*"
-
-# you can define service wide environment variables here
-#  environment:
-#    variable1: value1
-
 functions:
   update:
     handler: handler.handle
     events:
       - schedule: rate(30 minutes)
-#      - cloudwatchLog: '/aws/lambda/update'
+    environment:
+      EMAIL_SNS_TOPIC_ARN: !Ref EmailSNSTopic
+  subscribe:
+    handler: subscribe.subscribe_page
+    environment:
+      SUBSCRIBE_LAMBDA_ENDPOINT: !Ref SubscribeLambda
+  subscribe_return:
 
 
-#    Define function environment variables here
-#    environment:
-#      variable2: value2
+resources:
+  Resources:
+    RiverTrailAlertsTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: "RiverTrailAlertsTable"
+        AttributeDefinitions:
+          - AttributeName: "pk"
+            AttributeType: "S"
+          - AttributeName: "sk"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "pk"
+            KeyType: "HASH"
+          - AttributeName: "sk"
+            KeyType: "RANGE"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 10
+          WriteCapacityUnits: 2
+    EmailSNSTopic:
+      Type: "AWS::SNS::Topic"
+      Properties:
+        DisplayName: "RiverTrailAlerts"
+        TopicName: "RiverTrailAlertsTopic"
+    SubscribeLambda:
+      Type: "AWS::Lambda::Function"
+    RiverTrailAlertsTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: "RiverTrailAlertsTable"
+        AttributeDefinitions:
+          - AttributeName: "pk"
+            AttributeType: "S"
+          - AttributeName: "sk"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "pk"
+            KeyType: "HASH"
+          - AttributeName: "sk"
+            KeyType: "RANGE"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 10
+          WriteCapacityUnits: 2
+  Outputs:
+    EmailSNSTopicArn:
+      Value: !Ref 'EmailSNSTopic'
+      Description: ARN of the created SNS topic
 
-# you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
