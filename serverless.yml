@@ -51,9 +51,14 @@ functions:
     environment:
       DEPLOYMENT_STAGE: ${self:provider.stage}
       PAGE_ACCESS_TOKEN: ${self:custom.messenger.pageAccessToken}
-
+  subscribe:
+    handler: subscribe.subscribe_page
+    environment:
+      SUBSCRIBE_LAMBDA_ENDPOINT: !Ref SubscribeLambda
+  subscribe_return:
+    handler: src/frontend/subscribe.signed_up_page
 resources:
-  Resources:
+  Resources:  
     RiverTrailAlertsTable:
       Type: "AWS::DynamoDB::Table"
       Properties:
@@ -75,4 +80,3 @@ resources:
       Type: "AWS::SNS::Topic"
       Properties:
         DisplayName: "RiverTrailAlerts"
-
