@@ -10,7 +10,7 @@ class StatusModel(Model):
     """
 
     class Meta:
-        table_name = f"RiverTrailAlertsTable-{os.environ['DEPLOYMENT_STAGE']}"
+        table_name = f"RiverTrailAlertsTable-{os.getenv('DEPLOYMENT_STAGE', 'dev')}"
 
     pk = UnicodeAttribute(hash_key=True)   # Location
     sk = UnicodeAttribute(range_key=True)  # Time
