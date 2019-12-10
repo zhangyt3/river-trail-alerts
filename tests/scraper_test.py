@@ -27,8 +27,8 @@ def test_parse_html():
                 The Forks Port Rink
             </li>
             <li>
-              <svg class="svg-icon check"></svg>
-              The Forks Port to Queen Elizabeth Way
+                <svg class="svg-icon check"></svg>
+                The Forks Port to Queen Elizabeth Way
             </li>
         </ul>
         <ul>
