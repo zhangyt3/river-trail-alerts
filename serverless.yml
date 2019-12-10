@@ -62,23 +62,7 @@ resources:
         TopicName: "RiverTrailAlertsTopic"
     SubscribeLambda:
       Type: "AWS::Lambda::Function"
-    RiverTrailAlertsTable:
-      Type: "AWS::DynamoDB::Table"
-      Properties:
-        TableName: "RiverTrailAlertsTable"
-        AttributeDefinitions:
-          - AttributeName: "pk"
-            AttributeType: "S"
-          - AttributeName: "sk"
-            AttributeType: "S"
-        KeySchema:
-          - AttributeName: "pk"
-            KeyType: "HASH"
-          - AttributeName: "sk"
-            KeyType: "RANGE"
-        ProvisionedThroughput:
-          ReadCapacityUnits: 10
-          WriteCapacityUnits: 2
+
   Outputs:
     EmailSNSTopicArn:
       Value: !Ref 'EmailSNSTopic'

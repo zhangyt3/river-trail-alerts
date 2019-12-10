@@ -28,14 +28,23 @@
           <h3 class="display-5">
                 Get notified when the Red River skating trail opens
             </h3>
-          <form action="https://igpbsvcena.execute-api.us-east-1.amazonaws.com/testEmailLamba" method="POST", target="_blank">
-                <div class="form-group">
-                  <label for="exampleInputEmail">Email address</label>
-                  <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
-                  <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-              </form>
+          <form enctype="text/plain" action="https://igpbsvcena.execute-api.us-east-1.amazonaws.com/testEmailLamba" method="POST", target="_blank">
+            <div class="form-group">
+              <label for="exampleInputEmail">Email address</label>
+              <input type="email" name="userEmail" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+              <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>
+ 
+            <!-- For different types of subscriptions-->
+            <!-- <select name="cars">
+                <option value="volvo">Volvo</option>
+                <option value="saab">Saab</option>
+                <option value="fiat">Fiat</option>
+                <option value="audi">Audi</option>
+              </select>  -->
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
         </div>
 
   </body>
