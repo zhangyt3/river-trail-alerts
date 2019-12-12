@@ -30,10 +30,19 @@ functions:
     environment:
       EMAIL_SNS_TOPIC_ARN: !Ref EmailSNSTopic
   subscribe:
-    handler: subscribe.subscribe_page
+    handler: src/frontend/subscribe.subscribe_page
     environment:
       SUBSCRIBE_LAMBDA_ENDPOINT: !Ref SubscribeLambda
+    events:
+      - http:
+          path: /
+          method: get
+          integration: lambda
+          reponse:
+            headers:
+              Content-Type: "'text/html'"            
   subscribe_return:
+    handler: src/frontend/subscribe.signed_up_page
 
 
 resources:
