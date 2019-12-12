@@ -22,12 +22,14 @@ def subscribe_page():
     return page
 
 
-def lambda_handler(event, context):
+def signed_up_page(event, context):
     email_address = event['body'].lstrip("userEmail=")
 
     print(f"Event: {email_address}")
     success = True
     
+    print("**********\nCreate subscription for SNS Topic HERE\n**********")
+
     return_message = "Thanks for subscribing to River Trail Alerts!" if success \
         else "Sorry we could not subscribe you, please check if you are already subscribed or modify your email address."
     
