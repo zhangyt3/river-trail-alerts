@@ -21,6 +21,12 @@ sls deploy
 sls invoke --function update
 ```
 
+In order to develop and test Facebook Messenger webhooks you have specify the Messenger application's page access token during deployment
+
+```
+sls deploy --pageAccessToken <PAGE_ACCESS_TOKEN>
+```
+
 ## Running Unit Tests
 
 To run unit tests just go to the root directory of this project and run
