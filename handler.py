@@ -10,7 +10,7 @@ from notify.notifier import send_updates
 from pprint import pprint
 
 log = logging.getLogger()
-log.setLevel(logging.WARN)
+log.setLevel(logging.DEBUG)
 
 
 def get_time():
