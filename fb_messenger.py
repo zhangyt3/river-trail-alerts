@@ -58,10 +58,10 @@ def handle_message(sender_psid, message):
         if segments_in_text:
             message = ""
             statuses = get_latest_statuses(segments_orig)
-            for segment in segments:
+            for segment in segments_in_text:
                 for name, status in statuses.items():
                     if segment == name.lower():
-                        message += f"{Segment}: {status}\n"
+                        message += f"{segment}: {status}\n"
         else:
             message = 'Send the name of a trail segment to see its status:\n\n' + '\n'.join(
                 [f'\u2022 {seg}' for seg in segments]
