@@ -2,7 +2,6 @@ import pytest
 import os
 
 from unittest.mock import Mock, patch
-from unittest import mock
 
 from notify.notifier import form_email, send_emails
 
@@ -23,7 +22,7 @@ def test_send_emails():
     diffs = [('Nebraska', 'open', 'closed')]
     sns_client_mock = Mock()
     
-    with mock.patch.dict('os.environ', {'EMAIL_SNS_TOPIC_ARN': 'test-arn'}):
+    with patch.dict('os.environ', {'EMAIL_SNS_TOPIC_ARN': 'test-arn'}):
         send_emails(sns_client_mock, diffs)
         sns_client_mock.publish.assert_called_once()
 

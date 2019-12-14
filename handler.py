@@ -6,33 +6,13 @@ import logging
 from model.StatusModel import StatusModel
 from scrape.scraper import get_statuses
 from notify.notifier import send_updates
+from util import get_time, get_latest_statuses
 
 from pprint import pprint
 
 log = logging.getLogger()
 log.setLevel(logging.DEBUG)
 
-
-def get_time():
-  return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-def get_previous_statuses(locations):
-    statuses = dict()
-    for l in locations:
-        res = StatusModel.query(
-            l,
-            limit=1,
-            scan_index_forward=False
-        )
-       
-        try:
-            res = res.next()
-        except:
-            res = StatusModel(pk=l, sk=get_time(), status='closed')
-        
-        statuses[res.pk] = res.status
-
-    return statuses
 
 def find_diffs(prev, curr):
     """
@@ -50,7 +30,7 @@ def find_diffs(prev, curr):
 
 def handle_update():
     statuses = get_statuses()
-    previous_statuses = get_previous_statuses(statuses.keys())
+    previous_statuses = get_latest_statuses(statuses.keys())
     diffs = find_diffs(previous_statuses, statuses)
 
     if diffs:

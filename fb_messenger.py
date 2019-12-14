@@ -9,7 +9,6 @@ log = logging.getLogger()
 log.setLevel(logging.DEBUG)
 
 VERIFY_TOKEN = "super-secret-token"
-PAGE_ACCESS_TOKEN = os.environ['PAGE_ACCESS_TOKEN']
 
 
 def verify(mode, token, challenge):
@@ -20,6 +19,7 @@ def verify(mode, token, challenge):
     return 404, None
 
 def send_message(sender_psid, message):
+    PAGE_ACCESS_TOKEN = os.environ['PAGE_ACCESS_TOKEN']
     log.debug(f'Sending message to {sender_psid}')
     
     headers = {
