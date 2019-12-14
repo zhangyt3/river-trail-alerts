@@ -3,6 +3,7 @@ service: river-trail-alerts
 provider:
   name: aws
   runtime: python3.8
+  stage: ${opt:stage, 'dev'}
   timeout: 30
   iamRoleStatements:
     - Effect: "Allow"
@@ -29,13 +30,14 @@ functions:
       - schedule: rate(30 minutes)
     environment:
       EMAIL_SNS_TOPIC_ARN: !Ref EmailSNSTopic 
+      DEPLOYMENT_STAGE: ${self:provider.stage}
 
 resources:
   Resources:
     RiverTrailAlertsTable:
       Type: "AWS::DynamoDB::Table"
       Properties:
-        TableName: "RiverTrailAlertsTable"
+        TableName: RiverTrailAlertsTable-${self:provider.stage}
         AttributeDefinitions:
           - AttributeName: "pk"
             AttributeType: "S"
@@ -53,9 +55,4 @@ resources:
       Type: "AWS::SNS::Topic"
       Properties:
         DisplayName: "RiverTrailAlerts"
-        TopicName: "RiverTrailAlertsTopic"
-  Outputs:
-    EmailSNSTopicArn:
-      Value: !Ref 'EmailSNSTopic'
-      Description: ARN of the created SNS topic
 

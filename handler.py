@@ -13,6 +13,9 @@ log = logging.getLogger()
 log.setLevel(logging.WARN)
 
 
+def get_time():
+  return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
 def get_previous_statuses(locations):
     statuses = dict()
     for l in locations:
@@ -21,8 +24,12 @@ def get_previous_statuses(locations):
             limit=1,
             scan_index_forward=False
         )
-        res = res.next()
-
+       
+        try:
+            res = res.next()
+        except:
+            res = StatusModel(pk=l, sk=get_time(), status='closed')
+        
         statuses[res.pk] = res.status
 
     return statuses
@@ -49,9 +56,8 @@ def handle_update():
     if diffs:
         send_updates(diffs)
    
-    time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")  
     for location, is_open in statuses.items():
-        status_model = StatusModel(pk=location, sk=time, status=is_open)
+        status_model = StatusModel(pk=location, sk=get_time(), status=is_open)
         status_model.save()
 
 def handle(event, context):

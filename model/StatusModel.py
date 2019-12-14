@@ -1,3 +1,5 @@
+import os
+
 from pynamodb.models import Model
 from pynamodb.attributes import UnicodeAttribute
 
@@ -8,7 +10,7 @@ class StatusModel(Model):
     """
 
     class Meta:
-        table_name = "RiverTrailAlertsTable"
+        table_name = f"RiverTrailAlertsTable-{os.getenv('DEPLOYMENT_STAGE', 'dev')}"
 
     pk = UnicodeAttribute(hash_key=True)   # Location
     sk = UnicodeAttribute(range_key=True)  # Time
