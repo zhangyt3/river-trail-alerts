@@ -3,6 +3,8 @@ import json
 import logging
 import requests
 
+from typing import Tuple, List
+
 from util import get_latest_statuses, get_all_trail_segments
 
 log = logging.getLogger()
@@ -21,7 +23,8 @@ def verify(mode, token, challenge):
 def send_message(sender_psid, message):
     PAGE_ACCESS_TOKEN = os.environ['PAGE_ACCESS_TOKEN']
     log.debug(f'Sending message to {sender_psid}')
-    
+    log.debug(f'Message: {message}')
+
     headers = {
         'Content-Type': 'application/json'
     }
@@ -39,35 +42,60 @@ def send_message(sender_psid, message):
     )
     log.debug(response)
 
-def handle_message(sender_psid, message):
+def retrieve_status_on_numeric_input(i: int, segments: list) -> List[Tuple[str, str]]:
+    statuses = get_latest_statuses(segments)
+    statuses = [(place, status) for place, status in statuses.items()]
+
+    if i < 0 or i >= len(statuses):
+        return []
+    return [statuses[i - 1]]
+
+def retrieve_status_on_text_input(text: str, segments_lower: list, segments_orig) -> List[Tuple[str, str]]:
+    statuses = []
+    
+    segments_in_text = []
+    for segment in segments_lower:
+        if segment in text:
+            segments_in_text.append(segment)
+    
+    if segments_in_text:
+        statuses = get_latest_statuses(segments_orig)
+        for segment in segments_in_text:
+            for name, status in statuses.items():
+                if segment == name.lower():
+                    statuses.append((name, status))
+
+    return statuses
+
+def form_response_message(statuses: List[Tuple[str, str]]) -> str:
+    return '\n'.join([f'{segment}: {status}' for segment, status in statuses])
+
+def handle_message(sender_psid: str, message: str):
     log.debug(f'Handling message from {sender_psid}: {message}')
-    if 'text' in message:
-        text = message['text'].lower()
-        log.debug(text)
 
-        segments_orig = get_all_trail_segments()
-        segments = [segment.lower() for segment in segments_orig]
-        log.debug(f'Segments from DB: {segments}')
+    if 'text' not in message:
+        return
+    
+    text = message['text'].lower()
+    log.debug(text)
+    
+    segments_orig = get_all_trail_segments()
+    segments = [segment.lower() for segment in segments_orig]
+    log.debug(f'Segments from database: {segments}')
+    
+    statuses = None
+    if text.isnumeric():
+        statuses = retrieve_status_on_numeric_input(int(text), segments_orig)
+    else:
+        statuses = retrieve_status_on_text_input(text, segments, segments_orig)
+    
+    message = form_response_message(statuses)
+    if not message:
+        message = 'Send the name or number of a trail segment to see its status:\n' + '\n'.join(
+            [f'{i+1}. {seg}' for i, seg in enumerate(segments)]
+        )
 
-        segments_in_text = []
-        for segment in segments:
-            if segment in text:
-                segments_in_text.append(segment)
-
-        message = None
-        if segments_in_text:
-            message = ""
-            statuses = get_latest_statuses(segments_orig)
-            for segment in segments_in_text:
-                for name, status in statuses.items():
-                    if segment == name.lower():
-                        message += f"{segment}: {status}\n"
-        else:
-            message = 'Send the name of a trail segment to see its status:\n\n' + '\n'.join(
-                [f'\u2022 {seg}' for seg in segments]
-            )
-
-        send_message(sender_psid, message)
+    send_message(sender_psid, message)
 
 def handle_messages(obj, entries):
     if obj != 'page':
@@ -82,7 +110,6 @@ def handle_messages(obj, entries):
             if 'message' in event:
                 message = event['message']
                 handle_message(sender_psid, message)
-
     return 200    
 
 def webhook(event, context):
@@ -110,3 +137,4 @@ def webhook(event, context):
         response['body'] = challenge
     
     return response
+
