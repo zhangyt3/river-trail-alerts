@@ -45,13 +45,14 @@ def send_message(sender_psid, message):
 def retrieve_status_on_numeric_input(i: int, segments: list) -> List[Tuple[str, str]]:
     statuses = get_latest_statuses(segments)
     statuses = [(place, status) for place, status in statuses.items()]
-
-    if i < 0 or i >= len(statuses):
+    
+    idx = i - 1
+    if idx < 0 or idx >= len(statuses):
         return []
-    return [statuses[i - 1]]
+    return [statuses[idx]]
 
 def retrieve_status_on_text_input(text: str, segments_lower: list, segments_orig) -> List[Tuple[str, str]]:
-    statuses = []
+    res = []
     
     segments_in_text = []
     for segment in segments_lower:
@@ -63,9 +64,9 @@ def retrieve_status_on_text_input(text: str, segments_lower: list, segments_orig
         for segment in segments_in_text:
             for name, status in statuses.items():
                 if segment == name.lower():
-                    statuses.append((name, status))
+                    res.append((name, status))
 
-    return statuses
+    return res
 
 def form_response_message(statuses: List[Tuple[str, str]]) -> str:
     return '\n'.join([f'{segment}: {status}' for segment, status in statuses])
