@@ -32,15 +32,23 @@ functions:
   subscribe:
     handler: src/frontend/subscribe.subscribe_page
     environment:
-      SUBSCRIBE_LAMBDA_ENDPOINT: !Ref SubscribeLambda
+      SUBSCRIBE_LAMBDA_ENDPOINT: 
+        !Join
+          - ''
+          - - 'https://'
+            - !Ref ApiGatewayRestApi
+            - '.execute-api.'
+            - ${opt:region, self:provider.region}
+            - '.amazonaws.com/'
+            - ${self:provider.stage}
     events:
       - http:
           path: /
           method: get
           integration: lambda
-          reponse:
+          response:
             headers:
-              Content-Type: "'text/html'"            
+              Content-Type: "text/html"            
   subscribe_return:
     handler: src/frontend/subscribe.signed_up_page
 
@@ -69,8 +77,6 @@ resources:
       Properties:
         DisplayName: "RiverTrailAlerts"
         TopicName: "RiverTrailAlertsTopic"
-    SubscribeLambda:
-      Type: "AWS::Lambda::Function"
 
   Outputs:
     EmailSNSTopicArn:
