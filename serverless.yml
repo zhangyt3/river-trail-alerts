@@ -48,7 +48,7 @@ functions:
           integration: lambda
           response:
             headers:
-              Content-Type: "text/html"            
+              Content-Type: "'text/html'"            
   subscribe_return:
     handler: src/frontend/subscribe.signed_up_page
 
