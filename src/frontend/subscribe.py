@@ -7,7 +7,7 @@ log.setLevel(logging.WARN)
 
 searchpath="src/frontend/templates"
 
-def subscribe_page():
+def subscribe_page(event, context):
     templateLoader = jinja2.FileSystemLoader(searchpath=searchpath)
     templateEnv = jinja2.Environment(
         loader=templateLoader,
@@ -15,11 +15,19 @@ def subscribe_page():
     )
     template = templateEnv.get_template("index.html")
 
-    page = template.render(os.environ['SUBSCRIBE_LAMBDA_ENDPOINT'])
+
+    page = template.render(subscribe_url=os.environ['SUBSCRIBE_LAMBDA_ENDPOINT'])
 
     log.info(page)
 
-    return page
+    
+    return {
+        'statusCode': 200,
+        "headers": {
+            'Content-Type': 'text/html',
+        },
+        'body': page
+    }
 
 
 def signed_up_page(event, context):
