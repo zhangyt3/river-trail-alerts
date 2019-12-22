@@ -21,13 +21,15 @@ def subscribe_page(event, context):
     log.info(page)
 
     
-    return {
-        'statusCode': 200,
-        "headers": {
-            'Content-Type': 'text/html',
-        },
-        'body': page
-    }
+    # response = {
+    #     "statusCode": 200,
+    #     "headers": {
+    #         'Content-Type': 'text/html',
+    #     },
+    #     "body": page,
+    # }
+    # return response
+    return page
 
 
 def signed_up_page(event, context):
@@ -53,11 +55,12 @@ def signed_up_page(event, context):
         email_address=email_address
     )
     
-    return {
-        'statusCode': 200,
-        "headers": {
-            'Content-Type': 'text/html',
-        },
-        'body': page
-    }
-
+    # response = {
+    #     "statusCode": 200,
+    #     "headers": {
+    #         'Content-Type': 'text/html',
+    #     },
+    #     "body": page,
+    # }
+    # return response
+    return page
