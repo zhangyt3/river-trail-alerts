@@ -22,6 +22,8 @@ plugins:
 custom:
   pythonRequirements:
     dockerizePip: non-linux
+  messenger:
+    pageAccessToken: ${opt:pageAccessToken, env:PAGE_ACCESS_TOKEN, ''}
 
 functions:
   update:
@@ -31,6 +33,24 @@ functions:
     environment:
       EMAIL_SNS_TOPIC_ARN: !Ref EmailSNSTopic 
       DEPLOYMENT_STAGE: ${self:provider.stage}
+  fb_messenger_verify:
+    handler: fb_messenger.webhook
+    events:
+      - http:
+          path: /messenger
+          method: get
+    environment:
+      DEPLOYMENT_STAGE: ${self:provider.stage}
+      PAGE_ACCESS_TOKEN: ${self:custom.messenger.pageAccessToken}
+  fb_messenger_webhook:
+    handler: fb_messenger.webhook
+    events:
+      - http:
+          path: /messenger
+          method: post
+    environment:
+      DEPLOYMENT_STAGE: ${self:provider.stage}
+      PAGE_ACCESS_TOKEN: ${self:custom.messenger.pageAccessToken}
 
 resources:
   Resources:
