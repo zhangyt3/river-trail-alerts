@@ -51,9 +51,41 @@ functions:
     environment:
       DEPLOYMENT_STAGE: ${self:provider.stage}
       PAGE_ACCESS_TOKEN: ${self:custom.messenger.pageAccessToken}
-
+  subscribe:
+    handler: frontend/subscribe.subscribe_page
+    environment:
+      EMAIL_SNS_TOPIC_ARN: !Ref EmailSNSTopic 
+      SUBSCRIBE_LAMBDA_ENDPOINT: 
+        !Join
+          - ''
+          - - 'https://'
+            - !Ref ApiGatewayRestApi
+            - '.execute-api.'
+            - ${opt:region, self:provider.region}
+            - '.amazonaws.com/'
+            - ${self:provider.stage}
+    events:
+      # GET returns sign up form
+      - http:
+          path: /
+          method: get
+          integration: lambda
+          response:
+            template: $input.path('$')
+            headers:
+              Content-Type: "'text/html'"   
+      # POST adds subscription and returns confirmation page         
+      - http:
+          path: /
+          method: post
+          integration: lambda
+          response:
+            template: $input.path('$')
+            headers:
+              Content-Type: "'text/html'"
+    
 resources:
-  Resources:
+  Resources:  
     RiverTrailAlertsTable:
       Type: "AWS::DynamoDB::Table"
       Properties:
@@ -75,4 +107,3 @@ resources:
       Type: "AWS::SNS::Topic"
       Properties:
         DisplayName: "RiverTrailAlerts"
-
