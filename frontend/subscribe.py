@@ -3,34 +3,38 @@ import jinja2
 import os
 
 log = logging.getLogger()
-log.setLevel(logging.WARN)
+log.setLevel(logging.INFO)
 
-searchpath="src/frontend/templates"
+searchpath = "frontend/templates"
 
 def subscribe_page(event, context):
-    templateLoader = jinja2.FileSystemLoader(searchpath=searchpath)
-    templateEnv = jinja2.Environment(
-        loader=templateLoader,
-        autoescape=jinja2.select_autoescape(['html'])
-    )
-    template = templateEnv.get_template("index.html")
+    log.info(event)
+    method = event['method']
 
+    if method == 'GET':
+        templateLoader = jinja2.FileSystemLoader(searchpath=searchpath)
+        templateEnv = jinja2.Environment(
+            loader=templateLoader,
+            autoescape=jinja2.select_autoescape(['html'])
+        )
+        template = templateEnv.get_template("index.html")
 
-    page = template.render(subscribe_url=os.environ['SUBSCRIBE_LAMBDA_ENDPOINT'])
+        page = template.render(subscribe_url=os.environ['SUBSCRIBE_LAMBDA_ENDPOINT'])
+        log.info(page)
 
-    log.info(page)
-
-    
-    # response = {
-    #     "statusCode": 200,
-    #     "headers": {
-    #         'Content-Type': 'text/html',
-    #     },
-    #     "body": page,
-    # }
-    # return response
-    return page
-
+        # response = {
+        #     "statusCode": 200,
+        #     "headers": {
+        #         'Content-Type': 'text/html',
+        #     },
+        #     "body": page,
+        # }
+        # return response
+        return page
+    elif method == 'POST':
+        pass
+    else:
+        raise Exception(f"Invalid HTTP method {method}")
 
 def signed_up_page(event, context):
     email_address = event['body'].lstrip("userEmail=")
