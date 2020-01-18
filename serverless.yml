@@ -54,6 +54,7 @@ functions:
   subscribe:
     handler: frontend/subscribe.subscribe_page
     environment:
+      EMAIL_SNS_TOPIC_ARN: !Ref EmailSNSTopic 
       SUBSCRIBE_LAMBDA_ENDPOINT: 
         !Join
           - ''
@@ -64,6 +65,7 @@ functions:
             - '.amazonaws.com/'
             - ${self:provider.stage}
     events:
+      # GET returns sign up form
       - http:
           path: /
           method: get
@@ -71,9 +73,16 @@ functions:
           response:
             template: $input.path('$')
             headers:
-              Content-Type: "'text/html'"            
-  subscribe_return:
-    handler: frontend/subscribe.signed_up_page
+              Content-Type: "'text/html'"   
+      # POST adds subscription and returns confirmation page         
+      - http:
+          path: /
+          method: post
+          integration: lambda
+          response:
+            template: $input.path('$')
+            headers:
+              Content-Type: "'text/html'"
     
 resources:
   Resources:  
