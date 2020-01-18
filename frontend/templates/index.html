@@ -1,51 +1,29 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Winnipeg River Trail Alerts</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
-      integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
-      crossorigin=""
-    />
-    <script
-      src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
-      integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
-      crossorigin=""
-    ></script>
-  </head>
-  <body>
-        <div class="container">
-            <h1 class="display-3">River Trail Alerts</h1>
 
-          <h3 class="display-5">
-                Get notified when the Red River skating trail opens
-            </h3>
-          <form action={{ subscribe_url }} method="POST", target="_blank">
-            <div class="form-group">
-              <label for="exampleInputEmail">Email address</label>
-              <input type="email" name="userEmail" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
-              <small id="emailHelp" class="form-text text-muted">We will never share your email with anyone else.</small>
-            </div>
- 
-            <!-- For different types of subscriptions-->
-            <!-- <select name="cars">
-                <option value="volvo">Volvo</option>
-                <option value="saab">Saab</option>
-                <option value="fiat">Fiat</option>
-                <option value="audi">Audi</option>
-              </select>  -->
+<head>
+  <title>Winnipeg River Trail Alerts</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+</head>
 
-            <button type="submit" class="btn btn-primary">Submit</button>
-          </form>
-        </div>
+<body>
+  <div class="container">
+    <h1 class="display-3">River Trail Alerts</h1>
 
-  </body>
+    <h3 class="display-5">
+      Get notified when the Winnipeg River Trail status changes
+    </h3>
+    <form action={{ subscribe_url }} method="POST" , target="_blank">
+      <div class="form-group">
+        <label for="exampleInputEmail">Email address</label>
+        <input type="email" name="userEmail" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+          placeholder="Enter email">
+        <small id="emailHelp" class="form-text text-muted">We will never share your email with anyone else.</small>
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+</body>
 </html>
