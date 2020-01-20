@@ -30,6 +30,17 @@ custom:
     basePath: ''
     stage: prod
     createRoute53Record: true
+  url:
+    dev:
+      !Join
+        - ''
+        - - 'https://'
+          - !Ref ApiGatewayRestApi
+          - '.execute-api.'
+          - ${opt:region, self:provider.region}
+          - '.amazonaws.com/'
+          - ${self:provider.stage}
+    prod: https://rivertrailalerts.com     
 
 functions:
   update:
@@ -61,15 +72,7 @@ functions:
     handler: frontend/subscribe.subscribe_page
     environment:
       EMAIL_SNS_TOPIC_ARN: !Ref EmailSNSTopic 
-      SUBSCRIBE_LAMBDA_ENDPOINT: 
-        !Join
-          - ''
-          - - 'https://'
-            - !Ref ApiGatewayRestApi
-            - '.execute-api.'
-            - ${opt:region, self:provider.region}
-            - '.amazonaws.com/'
-            - ${self:provider.stage}
+      SUBSCRIBE_LAMBDA_ENDPOINT: ${self:custom.url.${self:provider.stage}}
     events:
       # GET returns sign up form
       - http:
