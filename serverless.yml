@@ -18,12 +18,18 @@ provider:
 
 plugins:
   - serverless-python-requirements
+  - serverless-domain-manager
 
 custom:
   pythonRequirements:
     dockerizePip: non-linux
   messenger:
     pageAccessToken: ${opt:pageAccessToken, env:PAGE_ACCESS_TOKEN, ''}
+  customDomain:
+    domainName: rivertrailalerts.com
+    basePath: ''
+    stage: prod
+    createRoute53Record: true
 
 functions:
   update:
