@@ -10,12 +10,15 @@
 
 <body>
   <div class="container">
-    <h1 class="display-3">River Trail Alerts</h1>
-
-    <h3 class="display-5">
-      Get notified when the Winnipeg River Trail status changes
-    </h3>
-    <form action={{ subscribe_url }} method="POST" , target="_blank">
+    <h3 class="display-3">River Trail Alerts</h3>
+    <h4 class="display-5">
+      Get notified when the Winnipeg River Trail status changes.
+    </h4>
+    <p class="lead">
+      We check the <a href="https://www.theforks.com/events/skating-trail-and-park-conditions">Winnipeg River Trail status page</a> every 30 minutes.
+      If there is an update, we will send you an email with the changes.
+    </p>
+    <form action="{{ subscribe_url }}" method="POST" , target="_blank">
       <div class="form-group">
         <label for="exampleInputEmail">Email address</label>
         <input type="email" name="userEmail" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
